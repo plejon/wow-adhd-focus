@@ -57,7 +57,7 @@ local function HandleSlash(input)
     Print("categories:")
     for category in pairs(A.Categories) do
       local on = ADHDFocusDB.enabled[category]
-      local state = on and "|cff88ff88muted|r" or "|cffffaa44audible|r"
+      local state = on and "|cff88ff88MuteOn|r" or "|cffffaa44MuteOff|r"
       Print(("  %s [%s] (%d ids)"):format(category, state, #A.Categories[category]))
     end
     local custom = 0

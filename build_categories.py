@@ -34,6 +34,22 @@ KEEP_AUDIBLE_PATTERNS = [
 # NPCs etc.). Negative lookahead skips the false positive.
 MOUNT_FOLDER = re.compile(r"^sound/creature/[^/]*mount(?!ain)[^/]*/")
 
+# Utility / buff spells we want OUT of keep-audible. These are sound/spell[s]/
+# filenames that match non-combat patterns — applied buffs, hearthstone,
+# portal/teleport, conjure food/water, etc. Conservative list to avoid
+# muting boss-ability sounds that happen to share prefixes (e.g.
+# blessingofhalazzi which is a ZA boss cast).
+UTILITY_SPELL_FILENAME = re.compile(
+    r"^sound/spells?/[^/]*("
+    r"hearth|refreshment|conjure|"
+    r"^teleport|_teleport|demonicsummonteleport|"
+    r"markofthewild|markofwild|giftofthewild|giftofwild|"
+    r"thorns|innerfire|arcaneint|amplifymagic|dampenmagic|"
+    r"divinespirit|prayerofspirit|prayer_of_spirit|"
+    r"fortitude_buff|powerwordfortitude|prayeroffortitude"
+    r")"
+)
+
 # Mount-specific creatures whose foley loops we want to mute (idle/breath/loop
 # audio only; the KEEP_AUDIBLE block above already protects summon/cast).
 CATEGORY_RULES = [
@@ -74,6 +90,10 @@ def categorize(path: str) -> str | None:
         if "_cast_" in path or "_precast_" in path:
             return None
         return "MountFoley"
+    # Utility / buff spells: override the global sound/spells/ keep-audible
+    # so these out-of-combat spell sounds get muted.
+    if UTILITY_SPELL_FILENAME.search(path):
+        return "UtilitySpells"
     for pat in KEEP_AUDIBLE_PATTERNS:
         if pat.search(path):
             return None
@@ -113,7 +133,7 @@ A.Categories = {}
     order = [
         "Weapons", "CharacterVocals", "Footsteps", "Doodads",
         "CreatureAmbience", "WorldAmbience", "Emotes", "Interface",
-        "Music", "MountFoley",
+        "Music", "MountFoley", "UtilitySpells",
     ]
     out = [head]
     for cat in order:

@@ -11,6 +11,7 @@ local DEFAULT_ENABLED = {
   Interface = true,
   Music = true,
   MountFoley = true,
+  UtilitySpells = true,
 }
 
 local function ApplyCategory(category, enable)

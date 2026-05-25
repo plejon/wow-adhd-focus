@@ -112,17 +112,6 @@ local function HandleSlash(input)
     local n = ApplyAll()
     Print("applied " .. n .. " mutes")
 
-  elseif cmd == "log" then
-    local mode = arg:lower()
-    if mode == "off" or mode == "stop" then
-      ADHDFocusDB.logging = false
-      Print("sound log: off")
-    else
-      ADHDFocusDB.logging = true
-      Print("sound log: on — perform the action you want to identify, then /adhd log off")
-      Print("(only catches sounds routed through Lua PlaySound/PlaySoundFile)")
-    end
-
   else
     Print("commands:")
     Print("  /adhd status              - show category states + id counts")
@@ -134,26 +123,6 @@ local function HandleSlash(input)
     Print("  /adhd unmute <id>         - unmute a custom fileDataId")
     Print("  /adhd list                - list custom muted ids")
     Print("  /adhd apply               - re-apply all enabled mutes")
-    Print("  /adhd log [off]           - log sounds to chat (for identifying)")
-  end
-end
-
-if type(hooksecurefunc) == "function" then
-  if type(PlaySound) == "function" then
-    hooksecurefunc("PlaySound", function(kit, channel)
-      if ADHDFocusDB and ADHDFocusDB.logging then
-        DEFAULT_CHAT_FRAME:AddMessage("|cffaaaaaaPlaySound|r " .. tostring(kit)
-          .. (channel and (" ch=" .. tostring(channel)) or ""))
-      end
-    end)
-  end
-  if type(PlaySoundFile) == "function" then
-    hooksecurefunc("PlaySoundFile", function(file, channel)
-      if ADHDFocusDB and ADHDFocusDB.logging then
-        DEFAULT_CHAT_FRAME:AddMessage("|cffaaaaaaPlaySoundFile|r " .. tostring(file)
-          .. (channel and (" ch=" .. tostring(channel)) or ""))
-      end
-    end)
   end
 end
 

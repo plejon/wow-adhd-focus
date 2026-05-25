@@ -1,0 +1,9 @@
+## Interface: 20504
+## Title: ADHDFocus
+## Notes: Bulk-mute non-essential sounds to reduce sensory overload in raids and PvP. Keeps spell casts, mount summons, stealth break, trinkets, flag cues audible.
+## Author: per.lejon
+## Version: 0.1
+## SavedVariables: ADHDFocusDB
+
+Categories.lua
+Core.lua

@@ -21,6 +21,66 @@ local CVAR_OVERRIDES = {
   Sound_EnableEmoteSounds = "0", -- silences /laugh /cheer NPC emote audio
 }
 
+-- Category-level preset bundles. Apply with /adhd profile <name>.
+-- Each profile is a complete category-state map; categories absent
+-- here fall back to true (muted).
+local PROFILES = {
+  -- "default": light sensory reduction, most game audio retained.
+  -- Closest to a vanilla WoW experience with the obvious noise removed.
+  ["default"] = {
+    SpellCasts       = false,
+    Weapons          = false,
+    Gear             = false,
+    CharacterVocals  = false,
+    Footsteps        = true,
+    Doodads          = true,
+    CreatureAmbience = false,
+    WorldAmbience    = true,
+    Emotes           = true,
+    Interface        = false,
+    Music            = true,
+    MountFoley       = true,
+    UtilitySpells    = false,
+  },
+  -- "pvp": current PvP-strict setup. Everything muted. The SPELL_KEEP
+  -- whitelist baked into Categories.lua surfaces the tactical cues
+  -- (CC, interrupts, roots, stuns, stealth openers, major CDs).
+  ["pvp"] = {
+    SpellCasts       = true,
+    Weapons          = true,
+    Gear             = true,
+    CharacterVocals  = true,
+    Footsteps        = true,
+    Doodads          = true,
+    CreatureAmbience = true,
+    WorldAmbience    = true,
+    Emotes           = true,
+    Interface        = true,
+    Music            = true,
+    MountFoley       = true,
+    UtilitySpells    = true,
+  },
+  -- "arena": same category set as pvp; intent is to ship a stricter
+  -- per-spell whitelist later. Profile granularity is category-only
+  -- right now, so pvp and arena are functionally identical until then.
+  ["arena"] = {
+    SpellCasts       = true,
+    Weapons          = true,
+    Gear             = true,
+    CharacterVocals  = true,
+    Footsteps        = true,
+    Doodads          = true,
+    CreatureAmbience = true,
+    WorldAmbience    = true,
+    Emotes           = true,
+    Interface        = true,
+    Music            = true,
+    MountFoley       = true,
+    UtilitySpells    = true,
+  },
+}
+local DEFAULT_PROFILE = "pvp"
+
 local function ApplyCategory(category, enable)
   local ids = A.Categories[category]
   if not ids then return 0 end
@@ -129,6 +189,28 @@ local function HandleSlash(input)
     end
     Print("reset all categories to defaults")
 
+  elseif cmd == "profile" then
+    local name = arg:lower():gsub("^%s*(.-)%s*$", "%1")
+    if name == "" or name == "list" then
+      Print("active profile: " .. (ADHDFocusDB.profile or DEFAULT_PROFILE))
+      Print("available:")
+      for k in pairs(PROFILES) do Print("  " .. k) end
+      return
+    end
+    local p = PROFILES[name]
+    if not p then
+      Print("unknown profile: " .. name .. " — try /adhd profile list")
+      return
+    end
+    for category in pairs(A.Categories) do
+      local desired = p[category]
+      if desired == nil then desired = true end
+      ADHDFocusDB.enabled[category] = desired
+      ApplyCategory(category, desired)
+    end
+    ADHDFocusDB.profile = name
+    Print("applied profile: " .. name)
+
   else
     Print("commands:")
     Print("  /adhd status              - show category states + id counts")
@@ -141,6 +223,8 @@ local function HandleSlash(input)
     Print("  /adhd list                - list custom muted ids")
     Print("  /adhd apply               - re-apply all enabled mutes")
     Print("  /adhd reset               - reset categories to defaults")
+    Print("  /adhd profile <name>      - apply a profile (default|pvp|arena)")
+    Print("  /adhd profile list        - show active + available profiles")
   end
 end
 

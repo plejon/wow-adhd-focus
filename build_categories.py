@@ -33,14 +33,37 @@ KEEP_AUDIBLE_PATTERNS = [
     re.compile(r"^sound/creature/[^/]+/.*(aggro|death|cast|summon)"),
 ]
 
-# Spell sound filename patterns the user has confirmed they want kept
-# audible during play. Add to this list as they identify each tactical
-# cue they need back. Matched against the full sound/spell[s]/ path,
-# case-insensitively (paths are already lowered).
+# Spell sound filename patterns the user wants kept audible. Combined
+# request set: stealth swoosh, all forms of CC, all roots, all stuns,
+# all stealth/prowl openers, all major cooldowns (Bestial Wrath,
+# Recklessness, etc). Use word-boundary anchors (`(^|/|_)token[._]`)
+# for short tokens to avoid false positives on substrings.
 SPELL_KEEP = re.compile(
     r"^sound/spells?/[^/]*("
-    # placeholder — empty whitelist, add patterns here as user requests
-    r"$^"  # impossible match while empty so nothing matches yet
+    # --- stealth / prowl / openers ---
+    r"stealth|prowl|vanish|shadow_?dance|invisibility|"
+    r"cheap_?shot|ambush|garrote|pounce|ravage|"
+    # --- CC ---
+    r"polymorph|"
+    r"(^|/|_)fear[._]|psychic_?scream|howl_?of_?fear|seduce|"
+    r"intimidating_?shout|scare_?animal|"
+    r"cyclone|hibernate|banish|repent|"
+    r"(^|/|_)sap[._]|gouge|blind|"
+    r"freezing_?trap|scatter_?shot|"
+    # --- roots ---
+    r"entangling_?roots|natures_?grasp|frost_?nova|"
+    # --- stuns ---
+    r"kidney_?shot|hammer_?of_?justice|mace_?stun|concussion_?blow|"
+    r"intercept_?stun|maim|intimidate|war_?stomp|(^|/|_)bash[._]|"
+    # --- interrupts ---
+    r"counter_?spell|pummel|kick_?rogue|earth_?shock|"
+    r"spell_?lock|spell_?silence|shadow_?word_?silence|"
+    # --- major cooldowns ---
+    r"bestial_?wrath|recklessness|berserker_?rage|death_?wish|"
+    r"inner_?focus|presence_?of_?mind|icy_?veins|arcane_?power|"
+    r"blade_?flurry|adrenaline_?rush|sprint|(^|/|_)fade[._]|"
+    r"divine_?favor|avenging_?wrath|"
+    r"blood_?fury|berserking|stoneform|escape_?artist"
     r")"
 )
 

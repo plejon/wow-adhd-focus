@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build ADHDFocus/Categories.lua from wow-listfile community CSV.
+"""Build Categories.lua from wow-listfile community CSV.
 
 Run: python3 build_categories.py [--refresh]
 """
@@ -13,7 +13,7 @@ from pathlib import Path
 
 LISTFILE_URL = "https://github.com/wowdev/wow-listfile/releases/latest/download/community-listfile.csv"
 CACHE = Path("/tmp/wow-community-listfile.csv")
-OUT = Path(__file__).parent / "ADHDFocus" / "Categories.lua"
+OUT = Path(__file__).parent / "Categories.lua"
 
 # Path-prefix matchers, evaluated top-to-bottom; first match wins.
 # Each entry is (category, predicate). Returning None from a predicate skips

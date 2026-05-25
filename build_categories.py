@@ -30,15 +30,12 @@ KEEP_AUDIBLE_PATTERNS = [
     re.compile(r"^sound/creature/[^/]+/.*(aggro|death|cast|summon|takeoff|land)"),
 ]
 
+# Folders whose name contains "mount" but not "mountain" (Highmountain tauren
+# NPCs etc.). Negative lookahead skips the false positive.
+MOUNT_FOLDER = re.compile(r"^sound/creature/[^/]*mount(?!ain)[^/]*/")
+
 # Mount-specific creatures whose foley loops we want to mute (idle/breath/loop
 # audio only; the KEEP_AUDIBLE block above already protects summon/cast).
-MOUNT_NAMES = re.compile(
-    r"^sound/creature/(horse|kodo|wolf|ram|raptor|tiger|sabercat|nightsaber|"
-    r"hawkstrider|elekk|mechanostrider|grypho?n|wyvern|dragonhawk|nethersteed|"
-    r"frostwolf|talbuk|warhorse|chocobo|charger|skeletalhorse|undeadhorse|"
-    r"mount)/"
-)
-
 CATEGORY_RULES = [
     # (category, regex) — first match wins.
     ("Footsteps",        re.compile(r"^sound/character/.*(footstep|foley)")),
@@ -50,11 +47,11 @@ CATEGORY_RULES = [
     ("Interface",        re.compile(r"^sound/interface/")),
     ("Music",            re.compile(r"^sound/music/")),
     ("WorldAmbience",    re.compile(r"^sound/(ambience|emitters)/")),
-    # Mount foley must come before generic creature ambience.
-    ("MountFoley",       re.compile(MOUNT_NAMES.pattern + r".*(loop|idle|breath|stand|walk|run|fidget)")),
     # Non-combat creature noise. Combat cues (aggro/death/cast/etc) are in the
     # keep-audible list above so they get excluded before reaching here.
-    ("CreatureAmbience", re.compile(r"^sound/creature/[^/]+/.*(ambient|ambience|idle|loop|breath|fidget|stand|walk|run)")),
+    # "moving" + "mountspecial" + "jumpstart" cover flying-mount wing flaps
+    # on non-mount-named flyers (dragons, drakes, gryphons used as NPCs).
+    ("CreatureAmbience", re.compile(r"^sound/creature/[^/]+/.*(ambient|ambience|idle|loop|breath|fidget|stand|walk|run|moving|mountspecial|jumpstart)")),
 ]
 
 
@@ -69,6 +66,14 @@ def fetch_listfile(refresh: bool) -> Path:
 def categorize(path: str) -> str | None:
     if not path.startswith("sound/"):
         return None
+    # Mount folders: keep ONLY the mount-up cast/precast sound, mute the rest
+    # (foley, wing flap loops, fidget, walk, run, moving, mountspecial).
+    # This overrides the global keep-audible list so mount wound/attack/etc.
+    # still get muted.
+    if MOUNT_FOLDER.match(path):
+        if "_cast_" in path or "_precast_" in path:
+            return None
+        return "MountFoley"
     for pat in KEEP_AUDIBLE_PATTERNS:
         if pat.search(path):
             return None
@@ -91,7 +96,13 @@ def render_lua(buckets: dict[str, list[tuple[int, str]]]) -> str:
 --   * sound/interface/raidwarning|readycheck|alarm|alert|warning
 --   * sound/cinematicvoices/*            cinematic dialog
 --   * sound/creature/*/aggro|death|cast|summon|takeoff|land
---                                        combat + flier cues, mount summons
+--                                        combat + flier cues (non-mount)
+--   * sound/creature/<mount>/*_cast_*    mount summon ("mounting up")
+--   * sound/creature/<mount>/*_precast_* mount summon channel
+--
+-- MountFoley mutes EVERYTHING else in mount-named creature folders
+-- (fidget, moving, walk, run, wing-flap loop, mountspecial, attack,
+-- battleshout, wound — sensory reduction wins over mounted combat cues).
 --
 -- To remove an individual mute at runtime: /adhd unmute <fileDataId>
 

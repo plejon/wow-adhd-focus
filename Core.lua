@@ -114,11 +114,15 @@ local function HandleSlash(input)
 
   else
     Print("commands:")
-    Print("  /adhd status                 - show category states + id counts")
-    Print("  /adhd mute   <category|id|all>")
-    Print("  /adhd unmute <category|id|all>")
-    Print("  /adhd list                   - list custom muted ids")
-    Print("  /adhd apply                  - re-apply all enabled mutes")
+    Print("  /adhd status              - show category states + id counts")
+    Print("  /adhd mute all            - mute every category")
+    Print("  /adhd unmute all          - unmute every category")
+    Print("  /adhd mute   <category>   - mute a single category")
+    Print("  /adhd unmute <category>   - unmute a single category")
+    Print("  /adhd mute   <id>         - mute a custom fileDataId")
+    Print("  /adhd unmute <id>         - unmute a custom fileDataId")
+    Print("  /adhd list                - list custom muted ids")
+    Print("  /adhd apply               - re-apply all enabled mutes")
   end
 end
 

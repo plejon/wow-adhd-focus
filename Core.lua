@@ -2,6 +2,7 @@ local ADDON, A = ...
 
 local DEFAULT_ENABLED = {
   Weapons = true,
+  Gear = true,
   CharacterVocals = true,
   Footsteps = true,
   Doodads = true,
@@ -12,6 +13,11 @@ local DEFAULT_ENABLED = {
   Music = true,
   MountFoley = true,
   UtilitySpells = true,
+}
+
+local CVAR_OVERRIDES = {
+  Sound_EnableErrorSpeech = "0", -- silences "Not enough mana!" voice lines
+  Sound_EnableEmoteSounds = "0", -- silences /laugh /cheer NPC emote audio
 }
 
 local function ApplyCategory(category, enable)
@@ -113,6 +119,15 @@ local function HandleSlash(input)
     local n = ApplyAll()
     Print("applied " .. n .. " mutes")
 
+  elseif cmd == "reset" then
+    for category in pairs(A.Categories) do
+      local desired = DEFAULT_ENABLED[category]
+      if desired == nil then desired = true end
+      ADHDFocusDB.enabled[category] = desired
+      ApplyCategory(category, desired)
+    end
+    Print("reset all categories to defaults")
+
   else
     Print("commands:")
     Print("  /adhd status              - show category states + id counts")
@@ -124,6 +139,16 @@ local function HandleSlash(input)
     Print("  /adhd unmute <id>         - unmute a custom fileDataId")
     Print("  /adhd list                - list custom muted ids")
     Print("  /adhd apply               - re-apply all enabled mutes")
+    Print("  /adhd reset               - reset categories to defaults")
+  end
+end
+
+local function EnforceCVars()
+  if type(SetCVar) ~= "function" then return end
+  for cvar, value in pairs(CVAR_OVERRIDES) do
+    if GetCVar and GetCVar(cvar) ~= value then
+      SetCVar(cvar, value)
+    end
   end
 end
 
@@ -139,6 +164,7 @@ f:SetScript("OnEvent", function(_, event, name)
       if ADHDFocusDB.enabled[k] == nil then ADHDFocusDB.enabled[k] = v end
     end
   elseif event == "PLAYER_LOGIN" then
+    EnforceCVars()
     local n = ApplyAll()
     Print(("loaded, %d sounds muted. /adhd for commands."):format(n))
   end

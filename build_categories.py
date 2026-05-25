@@ -59,6 +59,7 @@ CATEGORY_RULES = [
     ("Emotes",           re.compile(r"^sound/character/.*emote")),
     ("CharacterVocals",  re.compile(r"^sound/character/")),
     ("Weapons",          re.compile(r"^sound/item/weapons/")),
+    ("Gear",             re.compile(r"^sound/item/(foleysounds|usesounds)/")),
     ("Doodads",          re.compile(r"^sound/doodad/")),
     ("Interface",        re.compile(r"^sound/interface/")),
     ("Music",            re.compile(r"^sound/music/")),
@@ -131,7 +132,7 @@ local _, A = ...
 A.Categories = {}
 '''
     order = [
-        "Weapons", "CharacterVocals", "Footsteps", "Doodads",
+        "Weapons", "Gear", "CharacterVocals", "Footsteps", "Doodads",
         "CreatureAmbience", "WorldAmbience", "Emotes", "Interface",
         "Music", "MountFoley", "UtilitySpells",
     ]

@@ -28,6 +28,9 @@ KEEP_AUDIBLE_PATTERNS = [
     re.compile(r"^sound/item/weapons/(bow|gun)/"),
     re.compile(r"^sound/item/weapons/gunfire"),
     re.compile(r"^sound/interface/(raidwarning|readycheck|alarm|alert|warning)"),
+    # PvP objective audio cues: flag capture/taken, BG countdown,
+    # capture nodes, pvp warnings, victory/defeat stingers.
+    re.compile(r"^sound/interface/(pvp|ui_battlegroundcountdown|.*flag|ui_.*capture)"),
     re.compile(r"^sound/cinematicvoices/"),
     # Combat / alert cues from creatures: aggro, death, cast, summon
     re.compile(r"^sound/creature/[^/]+/.*(aggro|death|cast|summon)"),

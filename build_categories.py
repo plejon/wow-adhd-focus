@@ -31,6 +31,9 @@ KEEP_AUDIBLE_PATTERNS = [
     # PvP objective audio cues: flag capture/taken, BG countdown,
     # capture nodes, pvp warnings, victory/defeat stingers.
     re.compile(r"^sound/interface/(pvp|ui_battlegroundcountdown|.*flag|ui_.*capture)"),
+    # Queue-pop "ding" — shared LFG/BG/arena ready audio. Also queue
+    # notification on newer clients.
+    re.compile(r"^sound/interface/(lfg_dungeonready|.*queueing_notification)"),
     re.compile(r"^sound/cinematicvoices/"),
     # Combat / alert cues from creatures: aggro, death, cast, summon
     re.compile(r"^sound/creature/[^/]+/.*(aggro|death|cast|summon)"),

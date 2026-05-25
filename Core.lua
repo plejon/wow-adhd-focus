@@ -1,6 +1,7 @@
 local ADDON, A = ...
 
 local DEFAULT_ENABLED = {
+  SpellCasts = true,
   Weapons = true,
   Gear = true,
   CharacterVocals = true,

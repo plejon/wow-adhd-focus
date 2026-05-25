@@ -19,9 +19,12 @@ OUT = Path(__file__).parent / "Categories.lua"
 # Each entry is (category, predicate). Returning None from a predicate skips
 # that file entirely (keep-audible list).
 KEEP_AUDIBLE_PATTERNS = [
-    re.compile(r"^sound/spells?/"),  # spell + spells (crossbow lives here)
+    # NOTE: sound/spell[s]/ is NOT in keep-audible. PvP-strict strategy:
+    # everything in sound/spells/ goes into the SpellCasts category (muted
+    # by default). User listens during play and reports which spell sounds
+    # they want kept; we whitelist by adding patterns to SPELL_KEEP below.
     re.compile(r"^sound/item/trinkets/"),
-    # Ranged weapons = positional / threat cue in PvP & raid pulls
+    # Ranged weapons = positional / threat cue in PvP
     re.compile(r"^sound/item/weapons/(bow|gun)/"),
     re.compile(r"^sound/item/weapons/gunfire"),
     re.compile(r"^sound/interface/(raidwarning|readycheck|alarm|alert|warning)"),
@@ -29,6 +32,17 @@ KEEP_AUDIBLE_PATTERNS = [
     # Combat / alert cues from creatures: aggro, death, cast, summon
     re.compile(r"^sound/creature/[^/]+/.*(aggro|death|cast|summon)"),
 ]
+
+# Spell sound filename patterns the user has confirmed they want kept
+# audible during play. Add to this list as they identify each tactical
+# cue they need back. Matched against the full sound/spell[s]/ path,
+# case-insensitively (paths are already lowered).
+SPELL_KEEP = re.compile(
+    r"^sound/spells?/[^/]*("
+    # placeholder — empty whitelist, add patterns here as user requests
+    r"$^"  # impossible match while empty so nothing matches yet
+    r")"
+)
 
 # Folders whose name contains "mount" but not "mountain" (Highmountain tauren
 # NPCs etc.). Negative lookahead skips the false positive.
@@ -91,10 +105,15 @@ def categorize(path: str) -> str | None:
         if "_cast_" in path or "_precast_" in path:
             return None
         return "MountFoley"
-    # Utility / buff spells: override the global sound/spells/ keep-audible
-    # so these out-of-combat spell sounds get muted.
-    if UTILITY_SPELL_FILENAME.search(path):
-        return "UtilitySpells"
+    # Spell sound handling. Everything in sound/spell[s]/ defaults to muted
+    # (SpellCasts category). The user whitelists specific tactical sounds
+    # via SPELL_KEEP as they identify them during play.
+    if re.match(r"^sound/spells?/", path):
+        if SPELL_KEEP.search(path):
+            return None  # explicitly kept audible
+        if UTILITY_SPELL_FILENAME.search(path):
+            return "UtilitySpells"
+        return "SpellCasts"
     for pat in KEEP_AUDIBLE_PATTERNS:
         if pat.search(path):
             return None
@@ -110,7 +129,6 @@ def render_lua(buckets: dict[str, list[tuple[int, str]]]) -> str:
 -- (your edits here will be overwritten on next regenerate).
 --
 -- KEEP AUDIBLE (excluded from all categories below):
---   * sound/spell[s]/*                   all spell audio (incl. crossbow)
 --   * sound/item/trinkets/*              on-use trinket audio
 --   * sound/item/weapons/{bow,gun}/*     ranged weapons = positional cue
 --   * sound/item/weapons/gunfire*        top-level gun shots
@@ -121,6 +139,13 @@ def render_lua(buckets: dict[str, list[tuple[int, str]]]) -> str:
 --                                        moved to CreatureAmbience)
 --   * sound/creature/<mount>/*_cast_*    mount summon ("mounting up")
 --   * sound/creature/<mount>/*_precast_* mount summon channel
+--   * sound/spells?/* matching SPELL_KEEP
+--                                        explicit per-spell whitelist
+--                                        (empty until user identifies)
+--
+-- All other sound/spell[s]/ files go into the new SpellCasts category
+-- (default muted). User identifies what to keep via /adhd unmute <id>
+-- or by reporting back so SPELL_KEEP is updated.
 --
 -- MountFoley mutes EVERYTHING else in mount-named creature folders
 -- (fidget, moving, walk, run, wing-flap loop, mountspecial, attack,
@@ -132,9 +157,9 @@ local _, A = ...
 A.Categories = {}
 '''
     order = [
-        "Weapons", "Gear", "CharacterVocals", "Footsteps", "Doodads",
-        "CreatureAmbience", "WorldAmbience", "Emotes", "Interface",
-        "Music", "MountFoley", "UtilitySpells",
+        "SpellCasts", "Weapons", "Gear", "CharacterVocals", "Footsteps",
+        "Doodads", "CreatureAmbience", "WorldAmbience", "Emotes",
+        "Interface", "Music", "MountFoley", "UtilitySpells",
     ]
     out = [head]
     for cat in order:

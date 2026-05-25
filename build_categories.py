@@ -26,8 +26,8 @@ KEEP_AUDIBLE_PATTERNS = [
     re.compile(r"^sound/item/weapons/gunfire"),
     re.compile(r"^sound/interface/(raidwarning|readycheck|alarm|alert|warning)"),
     re.compile(r"^sound/cinematicvoices/"),
-    # Combat / alert cues from creatures: aggro, death, cast, summon, flier
-    re.compile(r"^sound/creature/[^/]+/.*(aggro|death|cast|summon|takeoff|land)"),
+    # Combat / alert cues from creatures: aggro, death, cast, summon
+    re.compile(r"^sound/creature/[^/]+/.*(aggro|death|cast|summon)"),
 ]
 
 # Folders whose name contains "mount" but not "mountain" (Highmountain tauren
@@ -51,7 +51,7 @@ CATEGORY_RULES = [
     # keep-audible list above so they get excluded before reaching here.
     # "moving" + "mountspecial" + "jumpstart" cover flying-mount wing flaps
     # on non-mount-named flyers (dragons, drakes, gryphons used as NPCs).
-    ("CreatureAmbience", re.compile(r"^sound/creature/[^/]+/.*(ambient|ambience|idle|loop|breath|fidget|stand|walk|run|moving|mountspecial|jumpstart|flap|flutter|wingbeat)")),
+    ("CreatureAmbience", re.compile(r"^sound/creature/[^/]+/.*(ambient|ambience|idle|loop|breath|fidget|stand|walk|run|moving|mountspecial|jumpstart|flap|flutter|wingbeat|takeoff|land)")),
 ]
 
 
@@ -95,8 +95,9 @@ def render_lua(buckets: dict[str, list[tuple[int, str]]]) -> str:
 --   * sound/item/weapons/gunfire*        top-level gun shots
 --   * sound/interface/raidwarning|readycheck|alarm|alert|warning
 --   * sound/cinematicvoices/*            cinematic dialog
---   * sound/creature/*/aggro|death|cast|summon|takeoff|land
---                                        combat + flier cues (non-mount)
+--   * sound/creature/*/aggro|death|cast|summon
+--                                        combat cues only (takeoff/land
+--                                        moved to CreatureAmbience)
 --   * sound/creature/<mount>/*_cast_*    mount summon ("mounting up")
 --   * sound/creature/<mount>/*_precast_* mount summon channel
 --

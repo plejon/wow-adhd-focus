@@ -51,7 +51,7 @@ CATEGORY_RULES = [
     # keep-audible list above so they get excluded before reaching here.
     # "moving" + "mountspecial" + "jumpstart" cover flying-mount wing flaps
     # on non-mount-named flyers (dragons, drakes, gryphons used as NPCs).
-    ("CreatureAmbience", re.compile(r"^sound/creature/[^/]+/.*(ambient|ambience|idle|loop|breath|fidget|stand|walk|run|moving|mountspecial|jumpstart|flap|flutter|wingbeat|takeoff|land)")),
+    ("CreatureAmbience", re.compile(r"^sound/creature/[^/]+/.*(ambient|ambience|idle|loop|breath|fidget|stand|walk|run|moving|mountspecial|jumpstart|flap|flutter|wingbeat|takeoff|land|flyup|fly_up|fly_start|flightstart|liftoff|lift_off)")),
 ]
 
 

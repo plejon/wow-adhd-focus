@@ -64,6 +64,8 @@ SPELL_KEEP = re.compile(
     # --- interrupts ---
     r"counter_?spell|pummel|kick_?rogue|earth_?shock|"
     r"spell_?lock|spell_?silence|shadow_?word_?silence|"
+    # --- BG / arena outcome stingers (BG defeat lives in sound/spells/) ---
+    r"pvpdefeat|pvpvictory|"
     # --- major cooldowns ---
     r"bestial_?wrath|recklessness|berserker_?rage|death_?wish|"
     r"inner_?focus|presence_?of_?mind|icy_?veins|arcane_?power|"

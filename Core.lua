@@ -9,8 +9,8 @@ local BUILTIN_PROFILES = {
     categories = {
       SpellCasts = true, Weapons = true, Gear = true,
       CharacterVocals = true, Footsteps = true, Doodads = true,
-      CreatureAmbience = true, WorldAmbience = true, Emotes = true,
-      Interface = true, Music = true, MountFoley = true,
+      CreatureAmbience = true, Emotes = true,
+      Interface = true, MountFoley = true,
       UtilitySpells = true,
     },
   },
@@ -19,8 +19,8 @@ local BUILTIN_PROFILES = {
     categories = {
       SpellCasts = true, Weapons = true, Gear = true,
       CharacterVocals = true, Footsteps = true, Doodads = true,
-      CreatureAmbience = true, WorldAmbience = true, Emotes = true,
-      Interface = true, Music = true, MountFoley = true,
+      CreatureAmbience = true, Emotes = true,
+      Interface = true, MountFoley = true,
       UtilitySpells = true,
     },
   },
@@ -29,8 +29,8 @@ local BUILTIN_PROFILES = {
     categories = {
       SpellCasts = false, Weapons = false, Gear = false,
       CharacterVocals = false, Footsteps = true, Doodads = true,
-      CreatureAmbience = false, WorldAmbience = true, Emotes = true,
-      Interface = false, Music = false, MountFoley = true,
+      CreatureAmbience = false, Emotes = true,
+      Interface = false, MountFoley = true,
       UtilitySpells = false,
     },
   },

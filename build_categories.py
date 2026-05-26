@@ -35,6 +35,13 @@ KEEP_AUDIBLE_PATTERNS = [
     # notification on newer clients.
     re.compile(r"^sound/interface/(lfg_dungeonready|.*queueing_notification)"),
     re.compile(r"^sound/cinematicvoices/"),
+    # NPC dialog & quest VO. WoW Dialog volume slider controls this channel;
+    # don't double-mute. Covers click responses, gossip greets, quest VO.
+    # Tokens are anchored to digit+.ogg so we don't false-match continuous
+    # SFX loops (e.g. clockworkgiant_readyspellloop.ogg → still muted).
+    re.compile(r"^sound/creature/[^/]+/.*(greet|farewell|agree|pissed|ready|what|yes|gossip|whatdoyouwant|howcaniserve|howmayihelp)[a-z]*[0-9]+\.ogg(\.meta)?$"),
+    re.compile(r"^sound/creature/.*/vo_[0-9]"),
+    re.compile(r"^sound/creature/.*/vo_[a-z]+_"),
     # Combat / alert cues from creatures: aggro, death, cast, summon
     re.compile(r"^sound/creature/[^/]+/.*(aggro|death|cast|summon)"),
 ]
@@ -107,13 +114,18 @@ CATEGORY_RULES = [
     ("Gear",             re.compile(r"^sound/item/(foleysounds|usesounds)/")),
     ("Doodads",          re.compile(r"^sound/doodad/")),
     ("Interface",        re.compile(r"^sound/interface/")),
-    ("Music",            re.compile(r"^sound/music/")),
-    ("WorldAmbience",    re.compile(r"^sound/(ambience|emitters)/")),
-    # Non-combat creature noise. Combat cues (aggro/death/cast/etc) are in the
+    # sound/music/* intentionally not bucketed — toggle via WoW UI (Sound -> Music)
+    # sound/ambience|emitters/* intentionally not bucketed — toggle via WoW UI Ambience slider
+    # Non-combat creature noise. Combat cues (aggro/death/cast/summon) are in the
     # keep-audible list above so they get excluded before reaching here.
-    # "moving" + "mountspecial" + "jumpstart" cover flying-mount wing flaps
-    # on non-mount-named flyers (dragons, drakes, gryphons used as NPCs).
-    ("CreatureAmbience", re.compile(r"^sound/creature/[^/]+/.*(ambient|ambience|idle|loop|breath|fidget|stand|walk|run|moving|mountspecial|jumpstart|flap|flutter|wingbeat|takeoff|land|flyup|fly_up|fly_start|flightstart|liftoff|lift_off)")),
+    # Catches:
+    #   - ambient loops (ambient/idle/loop/breath/fidget/stand)
+    #   - locomotion (walk/run/moving/mountspecial/jumpstart, flyer wing flaps)
+    #   - melee/spell-attack & wound (druid form attacks, mount engine attack
+    #     fx like mechastrider, generic NPC attack swings — non-tactical noise)
+    #   - "preaggro" metallic mech idle (mechastrider et al.)
+    #   - "chuff" engine puff (clockwork mounts)
+    ("CreatureAmbience", re.compile(r"^sound/creature/[^/]+/.*(ambient|ambience|idle|loop|breath|fidget|stand|walk|run|moving|mountspecial|jumpstart|flap|flutter|wingbeat|takeoff|land|flyup|fly_up|fly_start|flightstart|liftoff|lift_off|attack|wound|crit|preaggro|chuff|battleshout)")),
 ]
 
 
@@ -159,24 +171,29 @@ def render_lua(buckets: dict[str, list[tuple[int, str]]]) -> str:
 -- Edit the script's CATEGORY_RULES + KEEP_AUDIBLE_PATTERNS, not this file
 -- (your edits here will be overwritten on next regenerate).
 --
--- KEEP AUDIBLE (excluded from all categories below):
+-- NOT BUCKETED (left to WoW UI sliders, not muted by this addon):
+--   * sound/music/*                      WoW UI: Music slider
+--   * sound/ambience/* + sound/emitters/* WoW UI: Ambience slider
+--   * NPC dialog/gossip/quest VO         WoW UI: Dialog slider
+--                                        (sound/creature/*/{greet,yes,agree,
+--                                         dialog,vo_,...})
+--
+-- KEEP AUDIBLE (matched explicitly so they don't fall into a category):
 --   * sound/item/trinkets/*              on-use trinket audio
 --   * sound/item/weapons/{bow,gun}/*     ranged weapons = positional cue
 --   * sound/item/weapons/gunfire*        top-level gun shots
 --   * sound/interface/raidwarning|readycheck|alarm|alert|warning
 --   * sound/cinematicvoices/*            cinematic dialog
 --   * sound/creature/*/aggro|death|cast|summon
---                                        combat cues only (takeoff/land
---                                        moved to CreatureAmbience)
+--                                        combat cues only
 --   * sound/creature/<mount>/*_cast_*    mount summon ("mounting up")
 --   * sound/creature/<mount>/*_precast_* mount summon channel
 --   * sound/spells?/* matching SPELL_KEEP
 --                                        explicit per-spell whitelist
---                                        (empty until user identifies)
 --
--- All other sound/spell[s]/ files go into the new SpellCasts category
--- (default muted). User identifies what to keep via /adhd unmute <id>
--- or by reporting back so SPELL_KEEP is updated.
+-- All other sound/spell[s]/ files go into SpellCasts (default muted).
+-- User identifies what to keep via /adhd unmute <id> or by reporting back
+-- so SPELL_KEEP is updated.
 --
 -- MountFoley mutes EVERYTHING else in mount-named creature folders
 -- (fidget, moving, walk, run, wing-flap loop, mountspecial, attack,
@@ -189,8 +206,8 @@ A.Categories = {}
 '''
     order = [
         "SpellCasts", "Weapons", "Gear", "CharacterVocals", "Footsteps",
-        "Doodads", "CreatureAmbience", "WorldAmbience", "Emotes",
-        "Interface", "Music", "MountFoley", "UtilitySpells",
+        "Doodads", "CreatureAmbience", "Emotes",
+        "Interface", "MountFoley", "UtilitySpells",
     ]
     out = [head]
     for cat in order:

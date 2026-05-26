@@ -40,7 +40,7 @@ Enable **ADHDFocus** at character select.
 |----------|------------------------------------------------------------------------|
 | `pvp`    | Default. Everything muted. PvP-tactical spells stay audible.           |
 | `arena`  | Same as `pvp` at category level (room to differentiate later).         |
-| `light`  | Light muting: only footsteps, doodads, world ambience, music, mounts, emotes. Spells / weapons / gear / vocals all audible. |
+| `light`  | Light muting: only footsteps, doodads, mount foley, emotes. Spells / weapons / gear / vocals / creature noise all audible. |
 
 ### Saving custom profiles
 
@@ -63,23 +63,31 @@ Reserved names (cannot be used for saved profiles): `list`, `save`,
 
 Each profile is a category-state map. The categories themselves live in
 `Categories.lua` (auto-generated from the wow-listfile). Total bucketed
-sound IDs: ~85K out of ~277K under `sound/` in the listfile.
+sound IDs: ~95K out of ~277K under `sound/` in the listfile.
 
 | Category          | What it covers                                                                 | IDs    |
 |-------------------|--------------------------------------------------------------------------------|--------|
+| CreatureAmbience  | Non-tactical creature noise: idle/loop/breath/fidget/walk/run/wing-flap/takeoff/landing, plus attack/wound/crit/preaggro/chuff (druid form attacks, mechastrider engine, NPC melee swings). | ~44K   |
 | SpellCasts        | All `sound/spell[s]/*` except the tactical whitelist (see below).             | ~16.5K |
-| CreatureAmbience  | Idle/loop/breath/fidget/walk/run/wing-flap/takeoff/landing for non-mount creatures. | ~20K   |
 | CharacterVocals   | Race/gender vocalizations (jumps, falls, hits, breathing).                    | ~16K   |
 | Doodads           | Environmental objects (anvils, doors, fires, banners).                        | ~9K    |
-| WorldAmbience     | `sound/ambience/*` + `sound/emitters/*` (placed world ambient).               | ~8K    |
-| Music             | `sound/music/*`.                                                              | ~6K    |
-| MountFoley        | All `sound/creature/<mount>/*` **except** mount summon cast/precast.          | ~2.7K  |
 | Weapons           | `sound/item/weapons/*` **except** bow + gun (positional ranged cue kept).     | ~3K    |
+| MountFoley        | All `sound/creature/<mount>/*` **except** mount summon cast/precast.          | ~2.7K  |
 | Footsteps         | `sound/character/*footstep*` + `sound/foley/*`.                               | ~1.9K  |
-| Interface         | `sound/interface/*` **except** raid alerts + PvP cues (see whitelist).        | ~625   |
+| Interface         | `sound/interface/*` **except** raid alerts + PvP cues (see whitelist).        | ~615   |
 | Gear              | `sound/item/foleysounds/*` (armor jingle) + `sound/item/usesounds/*`.         | 78     |
 | UtilitySpells     | Hearthstone, refreshment, conjure, teleport, mark of the wild, thorns, inner fire, arcane intellect, etc. | 67     |
 | Emotes            | `sound/character/*emote*`.                                                    | 40     |
+
+### Not muted by this addon (use WoW UI)
+
+The following audio is intentionally left alone — WoW already exposes a
+dedicated volume slider, so duplicating the mute would just take control
+away from the slider.
+
+- **Music** (`sound/music/*`) — Sound options → Music slider.
+- **World ambience** (`sound/ambience/*` + `sound/emitters/*`) — Ambience slider.
+- **NPC dialog & quest VO** (gossip greets, click responses, `vo_*`) — Dialog slider.
 
 ## Sounds kept audible (whitelist)
 

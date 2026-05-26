@@ -94,7 +94,7 @@ away from the slider.
 These are excluded from category muting at the build step. They stay
 audible regardless of profile.
 
-### Tactical PvP spell cues (~216 files)
+### Tactical PvP spell cues
 
 Filename match on any of these tokens inside `sound/spell[s]/*`:
 
@@ -102,16 +102,39 @@ Filename match on any of these tokens inside `sound/spell[s]/*`:
   cheapshot, ambush, garrote, pounce, ravage.
 - **Crowd control** — polymorph, fear, psychic scream, howl of fear,
   seduce, intimidating shout, scare animal, cyclone, hibernate, banish,
-  repent, sap, gouge, blind, freezing trap, scatter shot.
+  repent, sap, gouge, blind, hex, freezing trap, scatter shot.
 - **Roots** — entangling roots, nature's grasp, frost nova.
 - **Stuns** — kidney shot, hammer of justice, mace stun, concussion blow,
   intercept stun, maim, intimidate, war stomp, bash.
 - **Interrupts / silences** — counterspell, pummel, kick (rogue),
   earth shock, spell lock, spell silence, shadow word: silence.
-- **Major cooldowns** — bestial wrath, recklessness, berserker rage,
+- **Defensive cooldowns** — divine shield, barkskin, evasion,
+  pain suppression, spell reflection, shield wall, blessing of freedom,
+  blessing of sacrifice, cold snap, soul shatter, earth shield,
+  gift of the naaru, innervate, disengage, swiftmend, tranquility.
+- **Offensive cooldowns** — bestial wrath, recklessness, berserker rage,
   death wish, inner focus, presence of mind, icy veins, arcane power,
   blade flurry, adrenaline rush, sprint, fade, divine favor,
-  avenging wrath, blood fury, berserking, stoneform, escape artist.
+  avenging wrath, blood fury, berserking, stoneform, escape artist,
+  mortal strike, piercing howl, rapid fire, kill command, aimed shot,
+  cold blood, shadowstep, power infusion, combustion, heroism,
+  bloodlust, purge, tiger's fury.
+
+#### Known gaps
+
+Some spells use generic, undescriptively-named sound files in the
+listfile and can't be matched by filename token. To keep them audible,
+look up the FileDataID on [wago.tools](https://wago.tools/db2/SoundKitEntry)
+and `/adhd unmute <id>`. Known offenders: Ice Block, Cloak of Shadows,
+Last Stand, Fear Ward, Nature's Swiftness, Readiness, Sweeping Strikes,
+Deterrence, Holy Shield, Divine Protection, Hand of Protection, Blink,
+Spellsteal, Fel Domination, totem cast sounds (grounding/tremor/earthbind).
+
+Also: short-token anchors like `(^|/|_)fear[._]` don't match bare
+filenames such as `sound/spells/fear.ogg`. Compound forms
+(`psychic_scream`, `howl_of_fear`, `_fear_*`) still match fine, but the
+bare `fear.ogg` / `sap.ogg` / `bash.ogg` / `fade.ogg` files are
+incorrectly muted today.
 
 ### PvP objective audio (`sound/interface/`)
 
@@ -129,7 +152,6 @@ all mounts — incoming-enemy cue in world PvP.
 
 ### Other
 
-- `sound/item/trinkets/*` — on-use PvP trinket audio.
 - `sound/item/weapons/{bow,gun}/*` + top-level `gunfire*` — ranged shots.
 - `sound/cinematicvoices/*` — cinematic dialog.
 - Raid alerts: `raidwarning`, `readycheck`, alarm clock, generic warning.

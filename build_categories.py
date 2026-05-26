@@ -61,7 +61,7 @@ SPELL_KEEP = re.compile(
     r"(^|/|_)fear[._]|psychic_?scream|howl_?of_?fear|seduce|"
     r"intimidating_?shout|scare_?animal|"
     r"cyclone|hibernate|banish|repent|"
-    r"(^|/|_)sap[._]|gouge|blind|"
+    r"(^|/|_)sap[._]|gouge|blind|hex|"
     r"freezing_?trap|scatter_?shot|"
     # --- roots ---
     r"entangling_?roots|natures_?grasp|frost_?nova|"
@@ -73,12 +73,24 @@ SPELL_KEEP = re.compile(
     r"spell_?lock|spell_?silence|shadow_?word_?silence|"
     # --- BG / arena outcome stingers (BG defeat lives in sound/spells/) ---
     r"pvpdefeat|pvpvictory|"
-    # --- major cooldowns ---
+    # --- defensive cooldowns (immunities, dmg reduc, CC breaks, escapes) ---
+    r"divine_?shield|barkskin|evasion|pain_?suppression|"
+    r"spell_?reflect|shield_?wall|"
+    r"blessing_?of_?freedom|blessingoffreedom|"
+    r"blessing_?of_?sacrifice|blessingofsacrifice|"
+    r"cold_?snap|soul_?shatter|earth_?shield|"
+    r"gift_?of_?naaru|giftofnaaru|innervate|disengage|"
+    r"swift_?mend|tranquility|"
+    # --- offensive cooldowns ---
     r"bestial_?wrath|recklessness|berserker_?rage|death_?wish|"
     r"inner_?focus|presence_?of_?mind|icy_?veins|arcane_?power|"
     r"blade_?flurry|adrenaline_?rush|sprint|(^|/|_)fade[._]|"
     r"divine_?favor|avenging_?wrath|"
-    r"blood_?fury|berserking|stoneform|escape_?artist"
+    r"blood_?fury|berserking|stoneform|escape_?artist|"
+    r"mortal_?strike|piercing_?howl|"
+    r"rapid_?fire|kill_?command|aimed_?shot|"
+    r"cold_?blood|shadow_?step|power_?infusion|combustion|"
+    r"heroism|bloodlust|purge|tigers?_?fury"
     r")"
 )
 
